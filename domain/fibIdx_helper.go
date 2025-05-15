@@ -30,6 +30,7 @@ func matrixMul(a, b [2][2]*big.Int) [2][2]*big.Int {
 	}
 }
 
+// 行列の累乗を計算する関数：計算量 O(log n)
 func MatrixPow(m [2][2]*big.Int, n *big.Int) [2][2]*big.Int {
 	ans := [2][2]*big.Int{{big.NewInt(1), big.NewInt(0)}, {big.NewInt(0), big.NewInt(1)}}
 	pm := m
