@@ -12,15 +12,15 @@ func CalcFibNum(fibIdx *big.Int) (*big.Int, error) {
 	}
 
 	//n = 2以上のときのフィボナッチ数列の値を返す
-	last2Num := big.NewInt(0)
-	last1Num := big.NewInt(1)
-	fibNum := big.NewInt(0)
+	fib0 := big.NewInt(0)
+	fib1 := big.NewInt(1)
 
-	for i := big.NewInt(2); i.Cmp(fibIdx) <= 0; i.Add(i, big.NewInt(1)) {
-		fibNum.Add(last1Num, last2Num)
-		last2Num.Set(last1Num)
-		last1Num.Set(fibNum)
-	}
+	fib_matrix := [2][2]*big.Int{{big.NewInt(1), big.NewInt(1)}, {big.NewInt(1), big.NewInt(0)}}
+	fib_matrix_pow := MatrixPow(fib_matrix, fibIdx)
+
+	fibNum := new(big.Int)
+	fibNum.Add(fibNum, fib0.Mul(fib0, fib_matrix_pow[1][0]))
+	fibNum.Add(fibNum, fib1.Mul(fib1, fib_matrix_pow[1][1]))
 
 	return fibNum, nil
 }
