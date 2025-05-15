@@ -27,9 +27,10 @@ func (fh *fibIdxHandler) HandlerCalcFibNum(c echo.Context) error {
 
 	fibNum, err := fh.fibIdxUsecase.CalcFibNum(fibIdxStr)
 	if err != nil {
-		if errors.Is(err, usecase.ErrInvalidInput) {
+		if errors.Is(err, usecase.ErrInvalidInput) { //不正な入力の場合
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": "n must be a non-negative integer"})
 		}
+		//想定していないエラーの場合
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "failed to calculate Fibonacci number"})
 	}
 
