@@ -21,12 +21,12 @@ func (fu *fibIdxUsecase) CalcFibNum(fibIdxStr string) (*big.Int, error) {
 	fibIdx := new(big.Int)
 	if _, ok := fibIdx.SetString(fibIdxStr, 10); !ok {
 		//整数に変換できない場合はエラーを返す
-		return nil, errors.New("n must be a non-negative integer")
+		return nil, ErrInvalidInput
 	}
 
 	if fibIdx.Cmp(big.NewInt(0)) < 0 {
 		//fibIdxが負の整数の場合はエラーを返す
-		return nil, errors.New("n must be a non-negative integer")
+		return nil, ErrInvalidInput
 	}
 
 	fibNum, err := service.CalcFibNum(fibIdx)

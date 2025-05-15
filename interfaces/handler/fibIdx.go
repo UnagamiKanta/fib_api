@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"net/http"
-
+	"errors"
 	"fib_api/usecase"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,7 +27,10 @@ func (fh *fibIdxHandler) HandlerCalcFibNum(c echo.Context) error {
 
 	fibNum, err := fh.fibIdxUsecase.CalcFibNum(fibIdxStr)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"message": "n must be less than or equal to 93"})
+		if errors.Is(err, usecase.ErrInvalidInput) {
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": "n must be a non-negative integer"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "failed to calculate Fibonacci number"})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"result": fibNum})
