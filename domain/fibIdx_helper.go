@@ -43,3 +43,34 @@ func MatrixPow(m [2][2]*big.Int, n *big.Int) [2][2]*big.Int {
 	}
 	return ans
 }
+
+func fibDoubling(n *big.Int) (*big.Int, *big.Int) {
+	if n.Cmp(big.NewInt(0)) == 0 {
+		return big.NewInt(0), big.NewInt(1)
+	}
+	if n.Cmp(big.NewInt(1)) == 0 {
+		return big.NewInt(1), big.NewInt(1)
+	}
+
+	k := new(big.Int).Rsh(n, 1)
+
+	fk, fk1 := fibDoubling(k) // F_k, F_{k+1}
+
+	// twoFk1  = 2 * F_{k+1}
+	twoFk1 := new(big.Int).Lsh(fk1, 1)
+	// t = (2 * F_{k+1} - F_k)
+	t := new(big.Int).Sub(twoFk1, fk)
+	// c = F_{2k} = F_k * (2*F_{k+1} – F_k)
+	c := new(big.Int).Mul(fk, t)
+
+	squaredFk := new(big.Int).Mul(fk, fk)
+	squaredFk1 := new(big.Int).Mul(fk1, fk1)
+	// d = F_{2k+1} = F_k^2 + F_{k+1}^2
+	d := new(big.Int).Add(squaredFk, squaredFk1)
+
+	if n.Bit(0) == 0 { // n が偶数の場合
+		return c, d
+	}
+
+	return d, new(big.Int).Add(c, d)
+}
