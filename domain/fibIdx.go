@@ -3,24 +3,11 @@ package domain
 import "math/big"
 
 func CalcFibNum(fibIdx *big.Int) (*big.Int, error) {
-	//n = 0, 1のときのフィボナッチ数列の値を返す
-	if fibIdx == big.NewInt(0) {
-		return big.NewInt(0), nil
-	}
-	if fibIdx == big.NewInt(1) {
-		return big.NewInt(1), nil
-	}
+	//[[1, 1], [1, 0]]^fibIdx の行列対角成分がフィボナッチ数列の一般項となる
+	fib_matrix := [2][2]*big.Int{{big.NewInt(1), big.NewInt(1)}, {big.NewInt(1), big.NewInt(0)}}
+	fib_matrix_pow := MatrixPow(fib_matrix, fibIdx)
 
-	//n = 2以上のときのフィボナッチ数列の値を返す
-	last2Num := big.NewInt(0)
-	last1Num := big.NewInt(1)
-	fibNum := big.NewInt(0)
-
-	for i := big.NewInt(2); i.Cmp(fibIdx) <= 0; i.Add(i, big.NewInt(1)) {
-		fibNum.Add(last1Num, last2Num)
-		last2Num.Set(last1Num)
-		last1Num.Set(fibNum)
-	}
+	fibNum := fib_matrix_pow[0][1]
 
 	return fibNum, nil
 }
