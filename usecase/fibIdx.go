@@ -29,6 +29,11 @@ func (fu *fibIdxUsecase) CalcFibNum(fibIdxStr string) (*big.Int, error) {
 		return nil, ErrInvalidInput
 	}
 
+	if fibIdx.Cmp(big.NewInt(MAXINPUTNUM)) > 0 {
+		//fibIdxがMAXINPUTNUMより大きい場合はエラーを返す
+		return nil, ErrTooLargeInput
+	}
+
 	fibNum, err := service.CalcFibNum(fibIdx)
 	if err != nil {
 		return nil, errors.New("failed to calculate Fibonacci number")
