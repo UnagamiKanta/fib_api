@@ -4,6 +4,7 @@ import (
 	"errors"
 	service "fib_api/domain"
 	"math/big"
+	"strconv"
 )
 
 type FibIdxUsecase interface {
@@ -17,6 +18,11 @@ func NewFibIdxUsecase() FibIdxUsecase {
 }
 
 func (fu *fibIdxUsecase) CalcFibNum(fibIdxStr string) (*big.Int, error) {
+	//入力が大きすぎるものは型変換できないので、エラーを返す
+	if len(fibIdxStr) > len(strconv.Itoa(MAXINPUTNUM)) {
+		return nil, ErrTooLargeInput
+	}
+
 	//入力を整数に変換
 	fibIdx := new(big.Int)
 	if _, ok := fibIdx.SetString(fibIdxStr, 10); !ok {
