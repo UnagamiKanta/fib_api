@@ -17,6 +17,9 @@
 
 ## 構成
 
+## main.go
+- サーバーの起動
+- エンドポイントの設定
 
 ## domain
 ドメインロジックの定義
@@ -64,4 +67,32 @@ CalcFibNumのテストコード$n\in [0, 6]$の各$n$まで実装
 
 ### usecase/const.go
 入力データの上限を設定現在(200000)
+
+## interfaces
+- 直接リクエストを受け取り、usecase層に渡す
+- usecase層の返り値から、適切なレスポンスを返す
+
+### interfaces/handler/fibIdx.go
+1. URLから入力文字列をを抽出
+2. usecase層に入力文字列を渡す
+3. usecase層の返り値に応じてレスポンスを返す
+
+> レスポンス一覧
+> - 成功
+>   - statuscode:200
+>   - body: {"result" : (入力インデックスに応じたフィボナッチ数列の項)}
+>
+> - 入力値が大きすぎるエラー
+>   - statuscode:400
+>   - body:{"message" : "n is too large, please use less than (入力値の最大値)"}
+> 
+> - 入力値が非負整数でないエラー
+>   - statuscode:400
+>   - body:{"message" : "n must be a non-negative integer"}
+>
+> - 想定していないエラー
+>   - statuscode:500
+>   - body:{"message" : "failed to calculate Fibonacci number"}
+>
+
 
