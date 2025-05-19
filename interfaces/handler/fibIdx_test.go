@@ -1,16 +1,17 @@
 package handler
 
 import (
-	"fib_api/usecase"
+  "fib_api/usecase"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
+  
 	"github.com/Cside/jsondiff"
 	"github.com/labstack/echo/v4"
 )
 
 func TestHandlerCalcFibNum(t *testing.T) {
+
 	tests := []struct {
 		name       string
 		fibIdxStr  string
