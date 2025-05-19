@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fib_api/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -29,6 +30,10 @@ func (fh *fibIdxHandler) HandlerCalcFibNum(c echo.Context) error {
 	if err != nil {
 		if errors.Is(err, usecase.ErrInvalidInput) { //不正な入力の場合
 			return c.JSON(http.StatusBadRequest, echo.Map{"message": "n must be a non-negative integer"})
+		}
+
+		if errors.Is(err, usecase.ErrTooLargeInput) { //入力が大きすぎる場合
+			return c.JSON(http.StatusBadRequest, echo.Map{"message": "n is too large, please use less than " + strconv.Itoa(usecase.MAXINPUTNUM)})
 		}
 		//想定していないエラーの場合
 		return c.JSON(http.StatusInternalServerError, echo.Map{"message": "failed to calculate Fibonacci number"})

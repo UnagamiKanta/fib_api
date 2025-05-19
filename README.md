@@ -1,3 +1,13 @@
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js">
+</script>
+<script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+ tex2jax: {
+ inlineMath: [['$', '$'] ],
+ displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+ }
+ });
+</script>
 # fib_api
 
 ## 使用技術
@@ -8,48 +18,50 @@
 ## 構成
 
 
-### domain
-*** domain/fibIdx.go ***
-役割：ドメインの定義
-今回のドメイン：*** フィボナッチ数列のインデックス ***
-ドメインが持つ値 : FibIdx(uint64)
-
-*** domain/Repository/fibIdx_repository.go ***
-役割：ドメインが持つ関数の定義
-ドメインが持つ関数：
-CalcFibNum
-引数：fibIdx(*domain.fibIdx)
-返り値：fibIdxに対応したfibonacci数(uint64)
-
-### usecase
-*** usecase/fibIdx.go ***
-役割：ドメインが持つビジネスロジックの定義
-関数:
-CalcFibNum
-
-バリデーション：
-- 値の形がUintに変換できるか？
-  - 負の値？
-  - 数値以外の値？
-  - 少数？
-  - 文字列？
-  - Uintでも表現できないレベルの大きさ？(どうなる？)
-- 正しい結果を返せる値か？(引数が大きすぎて結果をUintで表現できないレベルか？)←これは後で調べてconstにいれる
-キャッシュで引っ張ってくるのあり？←なし
-
-アルゴリズム(計算量：O(N))：
-1. 一つ前の結果をlast、2つ前の結果をlast2として保存
-2. result = last + last2で項を計算
-3. lastにresultを、last2にlastを代入
-
-### interfaces
-ハンドラを定義
-想定するレスポンス
-
-   
-| ステータスコード | レスポンス(Json) | 想定しているケース|
+## domain
+ドメインロジックの定義
+### domain/fibIdx.go
+今回のドメイン：フィボナッチ数列計算
+| 関数 | 引数 | 返り値|
 | ---- | ---- |  ---- |
-| 200 | {"result" : 対応するフィボナッチ数列の値} | 成功 |
-| 400 | {"message" : "invalid value"} |  値の形式が適切ではない(負の数や文字列など) |
-| 400 | {"message" : "too large value"} |  値が大きすぎる |
+| CalcFibNum | FibIdx(big.Int) | big.Int, error |
+
+フィボナッチ数列の一般項$F_n$は行列[[1, 1], [1, 0]]^nの対角成分であることを用いた
+
+### domain/fibIdx_helper.go
+ドメインロジックのためのヘルパー関数を記述
+| 関数 | 引数 | 返り値|役割|
+| ---- | ---- |  ---- | ---- |
+| MatrixMul | a([2][2]big.Int), b([2][2]big.Int) | [2][2]big.Int | 2×2行列同士の掛け算を定義|
+| MatrixPow | m([2][2]big.Int), n(big.Int) | [2][2]big.Int | 行列のべき乗を計算、計算量O($\log n$)|
+
+MatrixPowは繰り返し二乗法を用いることでO($\log n$)の計算量にしている
+[参考にしたサイト](https://qiita.com/ophhdn/items/e6451ec5983939ecbc5b)
+
+### domain/fibIdx_test.go
+CalcFibNumのテストコード$n\in [0, 6]$の各$n$まで実装
+
+
+## usecase
+- domainロジックに入力値を渡し、返り値をハンドラーに返す
+- 入力値のエラーハンドリング
+  
+> 想定しているエラー(エラー型)
+> - 入力値が大きすぎる(ErrInvalidInput)
+> - 入力値が非負整数(ErrTooLargeInput)
+
+### usecase/fibIdx.go
+1. 入力文字列データの長さでエラーハンドリング(長過ぎる文字列をbigIntに変換できないため)
+2. 入力文字列データをbigIntに型変換(エラーの際はErrInvalidInput)
+3. 入力データが大きすぎないかチェック(ErrInvalidInput)
+4. domain層のフィボナッチ数列を計算
+5. handlerに3の計算結果を返す
+
+### usecase/error.go
+想定しているエラー型の定義
+- 入力値が大きすぎる(ErrInvalidInput)
+- 入力値が非負整数(ErrTooLargeInput)
+
+### usecase/const.go
+入力データの上限を設定現在(200000)
 
