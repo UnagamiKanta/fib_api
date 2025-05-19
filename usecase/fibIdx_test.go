@@ -25,10 +25,16 @@ func TestFibIdxUsecase_CalcFibNum(t *testing.T) {
 			wantErr: ErrInvalidInput,
 		},
 		{
-			name:    "invalid inpput negative integer",
-			input:   "-5",
+			name:    "too large input",
+			input:   "200001",
 			want:    nil,
-			wantErr: ErrInvalidInput,
+			wantErr: ErrTooLargeInput,
+		},
+		{
+			name:    "too too large input",
+			input:   "100000000000000000000000000000000000",
+			want:    nil,
+			wantErr: ErrTooLargeInput,
 		},
 	}
 
