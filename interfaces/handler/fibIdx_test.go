@@ -1,18 +1,17 @@
 package handler
 
 import (
-	"fmt"
+  "fib_api/usecase"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"fib_api/usecase"
-
+  
+	"github.com/Cside/jsondiff"
 	"github.com/labstack/echo/v4"
 )
 
-// JSONレスポンスを比較できるようにする
-func TestFibIdxHandler_HandlerCalcFibNum(t *testing.T) {
+func TestHandlerCalcFibNum(t *testing.T) {
+
 	tests := []struct {
 		name       string
 		fibIdxStr  string
@@ -23,13 +22,19 @@ func TestFibIdxHandler_HandlerCalcFibNum(t *testing.T) {
 			name:       "valid input 0",
 			fibIdxStr:  "0",
 			wantStatus: http.StatusOK,
-			wantBody:   `{"result": 0}`,
+			wantBody:   `{"result":0}`,
 		},
 		{
-			name:       "invalid input -1",
-			fibIdxStr:  "-1",
+			name:       "invalid input not integer",
+			fibIdxStr:  "5.5",
 			wantStatus: http.StatusBadRequest,
 			wantBody:   `{"message":"n must be a non-negative integer"}`,
+		},
+		{
+			name:       "too large input",
+			fibIdxStr:  "200001",
+			wantStatus: http.StatusBadRequest,
+			wantBody:   `{"message":"n is too large, please use less than 200000"}`,
 		},
 	}
 
@@ -41,19 +46,22 @@ func TestFibIdxHandler_HandlerCalcFibNum(t *testing.T) {
 			c := e.NewContext(req, rec)
 
 			fu := usecase.NewFibIdxUsecase()
-			handler := NewFibIdxHandler(fu)
-			if err := handler.HandlerCalcFibNum(c); err != nil {
+			fh := NewFibIdxHandler(fu)
+
+			if err := fh.HandlerCalcFibNum(c); err != nil {
 				t.Errorf("HandlerCalcFibNum() error = %v", err)
 				return
 			}
 
-			fmt.Println("rec = ", rec)
-
+			//ステータスコードを確認
 			if rec.Code != tt.wantStatus {
 				t.Errorf("HandlerCalcFibNum() got status = %v, want %v", rec.Code, tt.wantStatus)
 			}
-			if rec.Body.String() != tt.wantBody {
+
+			//レスポンスの中身を確認
+			if diff := jsondiff.Diff([]byte(rec.Body.String()), []byte(tt.wantBody)); diff != "" {
 				t.Errorf("HandlerCalcFibNum() got body = %v, want %v", rec.Body.String(), tt.wantBody)
+				t.Errorf("Diff: %v", diff)
 			}
 		})
 	}
