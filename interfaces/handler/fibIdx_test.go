@@ -1,11 +1,11 @@
 package handler
 
 import (
-  "fib_api/usecase"
+	"fib_api/usecase"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-  
+
 	"github.com/Cside/jsondiff"
 	"github.com/labstack/echo/v4"
 )
@@ -28,13 +28,13 @@ func TestHandlerCalcFibNum(t *testing.T) {
 			name:       "invalid input not integer",
 			fibIdxStr:  "5.5",
 			wantStatus: http.StatusBadRequest,
-			wantBody:   `{"message":"n must be a non-negative integer"}`,
+			wantBody:   `{"status":400, "message":"n must be a non-negative integer"}`,
 		},
 		{
 			name:       "too large input",
 			fibIdxStr:  "200001",
 			wantStatus: http.StatusBadRequest,
-			wantBody:   `{"message":"n is too large, please use less than 200000"}`,
+			wantBody:   `{"status":400, "message":"n is too large, please use less than 200000"}`,
 		},
 	}
 
