@@ -89,9 +89,9 @@ usecase/fibIdx.goのテスト
 | ステータス | レスポンス | 詳細|
 | ---- | ---- |  ---- |
 | 200 | `{"result" : (フィボナッチ数)}` | 正常な入出力 |
-| 400 | `{"message" : "n must be a non-negative integer"}` | 非負整数以外の入力 |
-| 400 | `{"message" : "n is too large, please use less than (最大値)"}` | 大きすぎる入力 |
-| 500 | `{"message" : "failed to calculate Fibonacci number"}` | 予期しないエラー |
+| 400 | `{"status" : 400, "message" : "n must be a non-negative integer"}` | 非負整数以外の入力 |
+| 400 | `{"status" : 400, "message" : "n is too large, please use less than (最大値)"}` | 大きすぎる入力 |
+| 500 | `{"status" : 500, "message" : "failed to calculate Fibonacci number"}` | 予期しないエラー |
 
 ### interfaces/handler/fibIdx_test.go
 上記レスポンスのステータスコード500以外のものをテスト
